@@ -1,0 +1,11 @@
+# Local dev files
+.DS_Store
+
+# NPM
+node_modules
+
+# Built app
+server/app
+server/public/scripts
+server/public/styles
+server/public/templates
