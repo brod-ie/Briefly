@@ -12,13 +12,6 @@ paths =
   tests:
     src: "./tests/*.coffee"
 
-# Test
-# ====
-gulp.task "test", ->
-  jasmine = require "gulp-jasmine"
-
-  return gulp.src(paths.tests.src).pipe jasmine()
-
 # Scripts
 # =======
 gulp.task "scripts", ->
@@ -45,4 +38,3 @@ gulp.task "build", ["scripts"], ->
 gulp.task "default", ["build"], ->
   util.log "👓  Watching..."
   gulp.watch [paths.scripts.src], ["scripts"]
-  gulp.watch [paths.tests.src], ["test"]

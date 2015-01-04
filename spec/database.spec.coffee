@@ -9,24 +9,27 @@ describe 'SocketIO', ->
   # Make this run ./app/app.js after build
   # then test connection..
 
-  io = require "socket.io-client"
-  socketURL = "http://onin.herokuapp.com"
-  options =
-    transports: ["websocket"]
-    "force new connection": true
+  # io = require "socket.io-client"
+  # socketURL = "http://onin.herokuapp.com"
+  # options =
+  #   transports: ["websocket"]
+  #   "force new connection": true
 
-  connected = false
-  beforeEach (done) ->
-    client = io.connect socketURL, options
-    client.on "connect", (data) ->
-      console.log "connected!"
-      connected = true
-      done()
+  # connected = false
+  # beforeEach (done) ->
+  #   client = io.connect socketURL, options
+  #   client.on "connect", (data) ->
+  #     console.log "connected!"
+  #     connected = true
+  #     done()
 
-  it 'Client can connect to SocketIO', ->
-    expect(connected).toBe(true)
+  # it 'Client can connect to SocketIO', ->
+  #   expect(connected).toBe true
 
-describe 'Database', ->
+  it 'Can fail..', ->
+    expect(true).toBe false
+
+#describe 'Database', ->
   # db = null
   # collection = "testing"
   # key = 12345
@@ -56,4 +59,4 @@ describe 'Database', ->
 
   # it 'can delete a record', ->
 
-describe 'Authentication', ->
+#describe 'Authentication', ->
