@@ -37,9 +37,9 @@ router.get "/", (req, res) ->
   res.json
     Hello: "World"
 
-router.get "/test", (req, res) ->
+router.get "/hello/:name", (req, res) ->
   res.json
-    Hello: "Brodie"
+    Hello: req.params.name
 
 app.use '/v1.0/', router
 app.use '/v1/', router

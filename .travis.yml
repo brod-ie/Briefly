@@ -1,3 +1,10 @@
 language: node_js
 node_js:
-  - "0.10"
+- '0.10'
+deploy:
+  provider: heroku
+  api_key:
+    secure: muYsYZXWoTzlmStEWqEjmhbgTve5qvPiK58qjraaj98GSftq/0FX8+y2enSsUHidT6h7dgvVPGH34uUVSXGDR/yOE8Uo7bnISpgZZpaZVG2jdbICPaOQN6AuOe9UjmdR2sw/UYPyGKyQdaYZbprUz2V9D3MzwLnou5cOvlz8gZY=
+  app: briefly-chat
+  on:
+    repo: ryanbrodie/Briefly
