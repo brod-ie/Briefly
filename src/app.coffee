@@ -47,7 +47,7 @@ app.use '/v1/', router
 # Socket.IO
 io.on "connection", (socket) ->
   console.log "A user connected!"
-  io.emit "message", { "message": "hello!", "id": socket.id }
+  io.emit "message", { "message": "hi!", "id": socket.id }
 
 io.on "auth", (data) ->
   console.log data
