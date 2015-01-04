@@ -47,7 +47,7 @@ router.post "/auth", (req, res) ->
   if not credentials or credentials.name isnt "john" or credentials.pass isnt "secret"
     new Error "Bad credentials."
   else
-    res.end "Access granted"
+    res.json "Access granted"
 
 app.use '/v1.0/', router
 app.use '/v1/', router
