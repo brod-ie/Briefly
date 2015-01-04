@@ -4,6 +4,7 @@ require "coffee-script/register" # Needed for .coffee modules
 __ = require "#{ __dirname }/../lib/__"
 express = require "express"
 compress = require("compression")()
+auth = require "basic-auth"
 
 # Determine config
 config = __.config()
@@ -19,7 +20,7 @@ app.set 'json spaces', 2
 # Error handling
 app.use (err, req, res, next) ->
   console.error err.stack
-  res.status(500).send "Something broke!"
+  res.status(500).send JSON.stringify(err)
 
 # Redirect to versioned endpoint
 app.use (req, res, next) ->
@@ -40,6 +41,13 @@ router.get "/", (req, res) ->
 router.get "/hello/:name", (req, res) ->
   res.json
     Hello: req.params.name
+
+router.post "/auth", (req, res) ->
+  credentials = auth(req)
+  if not credentials or credentials.name isnt "john" or credentials.pass isnt "secret"
+    new Error "Bad credentials."
+  else
+    res.end "Access granted"
 
 app.use '/v1.0/', router
 app.use '/v1/', router

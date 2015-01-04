@@ -31,7 +31,8 @@
     "orchestrate": "^0.3.12",
     "gulp-uglify": "^1.0.1",
     "socket.io-client": "^1.2.1",
-    "jasmine-reporters": "^1.0.1"
+    "jasmine-reporters": "^1.0.1",
+    "basic-auth": "^1.0.0"
   },
   "engines": {
     "node": "^0.10.33"
