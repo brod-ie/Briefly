@@ -37,7 +37,7 @@ router = express.Router()
 
 router.get "/", (req, res) ->
   res.json
-    Hello: "World"
+    Hello: "Omar"
 
 router.get "/hello/:name", (req, res) ->
   res.json
