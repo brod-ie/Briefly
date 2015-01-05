@@ -43,11 +43,13 @@ router.get "/hello/:name", (req, res) ->
     Hello: req.params.name
 
 router.post "/auth", (req, res) ->
-  credentials = auth(req)
-  if not credentials or credentials.name isnt "john" or credentials.pass isnt "secret"
-    res.json "Bad credentials."
-  else
-    res.json "Access granted"
+  # credentials = auth(req)
+  # if not credentials or credentials.name isnt "john" or credentials.pass isnt "secret"
+  #   res.json "Bad credentials."
+  # else
+  #   res.json "Access granted"
+  res.json
+    Hi: "auth"
 
 app.use '/v1.0/', router
 app.use '/v1/', router
