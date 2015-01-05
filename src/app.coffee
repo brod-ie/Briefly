@@ -45,7 +45,7 @@ router.get "/hello/:name", (req, res) ->
 router.post "/auth", (req, res) ->
   credentials = auth(req)
   if not credentials or credentials.name isnt "john" or credentials.pass isnt "secret"
-    new Error "Bad credentials."
+    res.json "Bad credentials."
   else
     res.json "Access granted"
 
