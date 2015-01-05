@@ -3,7 +3,7 @@
   "private": true,
   "main": "./app/app.js",
   "scripts": {
-    "test": "node node_modules/.bin/jasmine-node --coffee spec/",
+    "test": "node node_modules/.bin/jasmine-node --coffee --verbose spec/",
     "postinstall": "node node_modules/.bin/gulp build",
     "before_script": "node node_modules/.bin/gulp build",
     "start": "node node_modules/.bin/supervisor -e 'js|css|jade|png|jpeg|json' app/app.js"
