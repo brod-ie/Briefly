@@ -20,7 +20,8 @@ app.set 'json spaces', 2
 # Error handling
 app.use (err, req, res, next) ->
   console.error err.stack
-  res.status(500).send JSON.stringify(err)
+  res.status(500)
+  res.json err
 
 # Redirect to versioned endpoint
 app.use (req, res, next) ->
@@ -62,6 +63,6 @@ io.on "connection", (socket) ->
 io.on "auth", (data) ->
   console.log data
 
-# Run server
-server = http.listen config.PORT, ->
+# Run server and return object
+return server = http.listen config.PORT, ->
   console.log "👂  Listening on port %d", server.address().port
