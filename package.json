@@ -32,7 +32,8 @@
     "gulp-uglify": "^1.0.1",
     "socket.io-client": "^1.2.1",
     "jasmine-reporters": "^1.0.1",
-    "basic-auth": "^1.0.0"
+    "basic-auth": "^1.0.0",
+    "frisby": "^0.8.4"
   },
   "engines": {
     "node": "^0.10.33"
