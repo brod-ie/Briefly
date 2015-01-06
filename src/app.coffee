@@ -25,6 +25,13 @@ app.use (req, res, next) ->
   req.body = JSON.parse req.body if typeof req.body is "string"
   next()
 
+# Force https connection
+app.use (req, res, next) ->
+  if req.protocol isnt "https" and config.ENVIRONMENT isnt "local"
+    err = new Error("You must connect using https")
+    err.status = 400
+    return next err
+
 # Datastore
 save = require("save")
 
@@ -151,14 +158,6 @@ app.use (req, res, next) ->
   err = new Error("Not found")
   err.status = 404
   next err
-
-# Force https connection
-# Isn't working?
-app.use (req, res, next) ->
-  if req.protocol isnt "https" and config.ENVIRONMENT isnt "local"
-    err = new Error("You must connect using https")
-    err.status = 400
-    next err
 
 # Error handler fn
 app.use (err, req, res, next) ->
