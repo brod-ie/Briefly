@@ -27,7 +27,7 @@ app.use (req, res, next) ->
 
 # Force https connection
 app.use (req, res, next) ->
-  if req.protocol isnt "https" and config.ENVIRONMENT isnt "local"
+  if req.protocol isnt "https" and config.ENVIRONMENT is "production"
     err = new Error("You must connect using https")
     err.status = 400
     return next err
