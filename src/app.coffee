@@ -3,10 +3,10 @@ require "coffee-script/register" # Needed for .coffee modules
 require "longjohn" if process.env.NODE_ENV isnt "production"
 require "log-timestamp"
 
-__ = require "#{ __dirname }/../lib/__"
 express = require "express"
-compress = require("compression")()
-basicAuth = require "basic-auth"
+
+# Lib classes
+__ = require "#{ __dirname }/../lib/__"
 
 # Determine config
 config = __.config()
@@ -16,52 +16,77 @@ http = require("http").Server(app)
 io = require("socket.io")(http)
 
 # Express settings
-app.use compress
+app.use require("compression")()
+app.use require("body-parser").json()
 app.set 'json spaces', 2
+
+# Datastore
+save = require("save")
+
+Messages = save("messages")
+Users = save("users")
+Tokens = save("tokens")
 
 # ROOT
 # ====
 app.get "/", (req, res) ->
   res.json
     status: 200
-    spec: "https://stackedit.io/editor#!provider=couchdb&id=1Iagla7H8vNH969Gd1puJQD6"
+    spec: "https://github.com/ryanbrodie/Briefly"
 
 # AUTHORISATION
 # =============
 
 # Auth middleware for easy token validation
 auth = (req, res, next) ->
-  if not req.query.token?
+  if not req.query? or not req.query.token?
     err = new Error("Access forbidden; no valid access token provided.")
     err.sendStatus = 401
     next err
 
-  console.log req.query.token
-  req.token = req.query.token
-  next()
+  Tokens.findOne { token: req.query.token }, (err, token) ->
+    req.token = token.token
+    req.username = token.username
+    next()
 
 # Bad access handler
 unauthorized = (res) ->
   res.set "WWW-Authenticate", "Basic realm=Authorization Required"
-  res.send 401
+  res.sendStatus 401
 
 # Authorisation request
 # --------------------
 app.post "/auth", (req, res, next) ->
-  user = basicAuth(req)
+  user = require("basic-auth")(req)
 
   return unauthorized(res) if not user or not user.name or not user.pass
 
-  if user.name is "foo" and user.pass is "bar"
-    res.json
-      Hello: "foo"
-  else
-    unauthorized(res)
+  Users.findOne { username: user.name, password: user.pass }, (err, user) ->
+    return unauthorized(res) if user is undefined
+
+    Tokens.findOne { username: user.username }, (err, token) ->
+      if token isnt undefined
+        return res.json(token)
+
+      token =
+        token: require('rand-token').generate(16),
+        username: user.username
+
+      Tokens.create token, (err, token) ->
+        return res.json(token)
+
 
 # Deauthorisation request
 # -----------------------
 app.delete "/auth", auth, (req, res, next) ->
-  res.json req.token
+  Tokens.findOne { token: req.token }, (err, token) ->
+    if token is undefined
+      err = new Error("Valid token not found")
+      err.sendStatus = 400
+      return next err
+
+    Token.deleteMany { token: req.query.token }, (err) ->
+      return res.json({ success: "Token destroyed" })
 
 # MESSAGE PASSING
 # ===============
@@ -69,15 +94,48 @@ app.delete "/auth", auth, (req, res, next) ->
 # Create message
 # --------------
 app.post "/message", auth, (req, res, next) ->
-  res.json req.token
+  if not req.body? or not req.body.message?
+    err = new Error("No message provided")
+    err.sendStatus = 400
+    return next err
+
+  message =
+    message: req.body.message
+    from: req.username
+    at: Date.now()
+
+  Messages.create message, (err, message) ->
+    res.json message
 
 # Get recent messages
 # -------------------
 app.get "/messages", auth, (req, res, next) ->
-  # e.g. find where timestamp < 1 week
+  Messages.find {}, (err, messages) ->
+    res.json messages
 
 # USERS
 # =====
+
+# Create user
+# -----------
+app.post "/user", (req, res, next) ->
+  if not req.body? or not req.body.username? or not req.body.password?
+    err = new Error("Missing username or password")
+    err.status = 400
+    return next err
+
+  Users.findOne { username: req.body.username }, (err, user) ->
+    if user isnt undefined
+      err = new Error("User already exists with that username")
+      err.status = 400
+      return next err
+
+    user =
+      username: req.body.username
+      password: req.body.password
+
+    Users.create user, (err, user) ->
+      return next res.json({ success: "User created" })
 
 # Get active users
 # ----------------
@@ -93,6 +151,7 @@ app.use (req, res, next) ->
   next err
 
 # Force https connection
+# Isn't working?
 app.use (req, res, next) ->
   if req.protocol isnt "https" and config.ENVIRONMENT isnt "local"
     err = new Error("You must connect using https")
@@ -118,7 +177,6 @@ io.use (socket, next) ->
     socket.disconnect()
   else
     next()
-
 
 io.on "connection", (socket) ->
   # Store socket.id internally as active?

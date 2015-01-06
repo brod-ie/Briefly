@@ -31,16 +31,29 @@ describe "API Server", ->
     .toss()
 
   frisby
-    .create "REST API can return an access token for valid user"
-    .post "http://foo:bar@localhost:#{ config.PORT }/auth"
+    .create "REST API can create user"
+    .post "http://localhost:#{ config.PORT }/user",
+      username: "brodie"
+      password: "password"
+    ,
+      json: true
+    .expectHeaderContains 'Content-Type', 'json'
+    .expectStatus 200
     .expectJSON
-      Hello: "foo"
+      success: "User created"
     .toss()
 
   frisby
     .create "REST API can deny access to an invalid user"
     .post "http://fool:bart@localhost:#{ config.PORT }/auth"
     .expectStatus 401
+    .toss()
+
+  frisby
+    .create "REST API can return an access token for valid user"
+    .post "http://foo:bar@localhost:#{ config.PORT }/auth"
+    .expectJSON
+      Hello: "foo"
     .toss()
 
   it 'can accept new message with valid token', ->
