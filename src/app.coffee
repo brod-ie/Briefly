@@ -42,22 +42,23 @@ app.get "/", (req, res) ->
 # AUTHORISATION
 # =============
 
-# Auth middleware for easy token validation
-auth = (req, res, next) ->
-  if not req.query? or not req.query.token?
-    err = new Error("Access forbidden; no valid access token provided.")
-    err.sendStatus = 401
-    next err
-
-  Tokens.findOne { token: req.query.token }, (err, token) ->
-    req.token = token.token
-    req.username = token.username
-    next()
-
 # Bad access handler
 unauthorized = (res) ->
   res.set "WWW-Authenticate", "Basic realm=Authorization Required"
   res.sendStatus 401
+
+# Auth middleware for easy token validation
+auth = (req, res, next) ->
+  if not req.query? or not req.query.token?
+    return unauthorized res
+
+  Tokens.findOne { token: req.query.token }, (err, token) ->
+    console.log "found token.."
+    console.log token
+    return unauthorized res if token is undefined
+    req.token = token.token
+    req.username = token.username
+    next()
 
 # Authorisation request
 # --------------------
@@ -74,26 +75,19 @@ app.post "/auth", (req, res, next) ->
         return res.json(token)
 
       token =
-        token: require('rand-token').generate(16),
+        token: require('rand-token').generate(16)
         username: user.username
 
-      token.token = 12345 if user.username is "brodie"
+      token.token = "abcde" if user.username is "brodie"
 
       Tokens.create token, (err, token) ->
         return res.json(token)
 
-
 # Deauthorisation request
 # -----------------------
 app.delete "/auth", auth, (req, res, next) ->
-  Tokens.findOne { token: req.token }, (err, token) ->
-    if token is undefined
-      err = new Error("Valid token not found")
-      err.sendStatus = 400
-      return next err
-
-    Token.deleteMany { token: req.query.token }, (err) ->
-      return res.json({ success: "Token destroyed" })
+  Tokens.deleteMany { token: req.token }, (err) ->
+    return res.json({ success: "Token destroyed" })
 
 # MESSAGE PASSING
 # ===============
@@ -103,7 +97,7 @@ app.delete "/auth", auth, (req, res, next) ->
 app.post "/message", auth, (req, res, next) ->
   if not req.body? or not req.body.message?
     err = new Error("No message provided")
-    err.sendStatus = 400
+    err.status = 400
     return next err
 
   message =
@@ -143,7 +137,7 @@ app.post "/user", (req, res, next) ->
       password: req.body.password
 
     Users.create user, (err, user) ->
-      return next res.json({ success: "User created" })
+      res.json({ success: "User created" })
 
 # Get active users
 # ----------------
@@ -181,9 +175,11 @@ io.use (socket, next) ->
   # Parse URL
   u = require("url").parse socket.handshake.url, true
 
-  if u.query.token isnt "12345"
-    socket.disconnect()
-  else
+  if not u.query? or not u.query.token?
+    return socket.disconnect()
+
+  Tokens.findOne { token: u.query.token }, (err, token) ->
+    return socket.disconnect() if token is undefined
     next()
 
 io.on "connection", (socket) ->
