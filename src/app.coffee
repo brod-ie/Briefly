@@ -17,8 +17,13 @@ io = require("socket.io")(http)
 
 # Express settings
 app.use require("compression")()
-app.use require("body-parser").json()
+app.use require("body-parser").json({ strict: false })
 app.set 'json spaces', 2
+
+# Fix json error
+app.use (req, res, next) ->
+  req.body = JSON.parse req.body if typeof req.body is "string"
+  next()
 
 # Datastore
 save = require("save")
@@ -72,6 +77,8 @@ app.post "/auth", (req, res, next) ->
         token: require('rand-token').generate(16),
         username: user.username
 
+      token.token = 12345 if user.username is "brodie"
+
       Tokens.create token, (err, token) ->
         return res.json(token)
 
@@ -120,6 +127,7 @@ app.get "/messages", auth, (req, res, next) ->
 # -----------
 app.post "/user", (req, res, next) ->
   if not req.body? or not req.body.username? or not req.body.password?
+    console.log req.body
     err = new Error("Missing username or password")
     err.status = 400
     return next err

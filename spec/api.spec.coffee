@@ -8,12 +8,16 @@ config = __.config()
 
 describe "API Server", ->
   server = require "#{ __dirname }/../app/app"
+  username = "brodie"
+  password = "password"
+  token = 12345 # Dummy token accepted by API for username "brodie"
+
   # client = io.connect "http://localhost:#{ config.PORT }?token=12345"
   # client.on "connect", (data) ->
   #   console.log "connected!"
   #   connected = true
 
-  # REST API
+  REST API
   frisby
     .create "REST API can be reached"
     .get "http://localhost:#{ config.PORT }"
@@ -31,16 +35,27 @@ describe "API Server", ->
     .toss()
 
   frisby
-    .create "REST API can create user"
-    .post "http://localhost:#{ config.PORT }/user",
-      username: "brodie"
-      password: "password"
-    ,
-      json: true
-    .expectHeaderContains 'Content-Type', 'json'
+    .create "REST API can create unique user"
+    .post "http://localhost:#{ config.PORT }/user", { username: username, password: password }, { json: true }
     .expectStatus 200
     .expectJSON
       success: "User created"
+    .toss()
+
+  frisby
+    .create "REST API can prohibit duplicate users"
+    .post "http://localhost:#{ config.PORT }/user", { username: username, password: password }, { json: true }
+    .expectStatus 400
+    .expectJSON
+      error: "User already exists with that username"
+    .toss()
+
+  frisby
+    .create "REST API can determine missing credentials on user create"
+    .post "http://localhost:#{ config.PORT }/user", {}, { json: true }
+    .expectStatus 400
+    .expectJSON
+      error: "Missing username or password"
     .toss()
 
   frisby
@@ -51,32 +66,31 @@ describe "API Server", ->
 
   frisby
     .create "REST API can return an access token for valid user"
-    .post "http://foo:bar@localhost:#{ config.PORT }/auth"
-    .expectJSON
-      Hello: "foo"
+    .post "http://#{ username }:#{ password }@localhost:#{ config.PORT }/auth"
+    .expectStatus 200
     .toss()
 
-  it 'can accept new message with valid token', ->
+  # it 'can accept new message with valid token', ->
 
-  it 'Client can connect to SocketIO', ->
-    #expect(connected).toBe true
+  # it 'Client can connect to SocketIO', ->
+  #   #expect(connected).toBe true
 
-  it 'Can fail..', ->
-    #expect(true).toBe false
+  # it 'Can fail..', ->
+  #   #expect(true).toBe false
 
-  it 'can be connected to with a valid access token', ->
+  # it 'can be connected to with a valid access token', ->
 
-  it 'can error when connected to with invalid access token', ->
+  # it 'can error when connected to with invalid access token', ->
 
-  it 'can recieve a new message', ->
+  # it 'can recieve a new message', ->
 
-  it 'can '
+  # it 'can '
 
-  it 'can emit array of connected users on new connection', ->
+  # it 'can emit array of connected users on new connection', ->
 
-  it 'can emit array of messages on new message', ->
+  # it 'can emit array of messages on new message', ->
 
-  it 'can emit array of messages and users to new connection', ->
+  # it 'can emit array of messages and users to new connection', ->
 
   # Timeout server now complete
   afterEach ->
