@@ -25,13 +25,6 @@ app.use (req, res, next) ->
   req.body = JSON.parse req.body if typeof req.body is "string"
   next()
 
-# Force https connection
-app.use (req, res, next) ->
-  if req.protocol is "http" and config.ENVIRONMENT is "production"
-    err = new Error("You must connect using https")
-    err.status = 400
-    return next err
-
 # Datastore
 save = require("save")
 
