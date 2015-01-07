@@ -99,6 +99,10 @@ describe "API Server", ->
       console.log "new message!"
       console.log message
       expect(message.message).toBe "Hello world!"
+
+    client.on "users/active", (users) ->
+      console.log "A user connected/disconnected"
+      expect(users).toBe(jasmine.any(Object))
     done()
 
   # MESSAGES

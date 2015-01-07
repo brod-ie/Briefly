@@ -189,16 +189,19 @@ io.on "connection", (socket) ->
     ActiveUsers.delete { username: socket.username }, (err) ->
       console.log "#{ user.username } disconnected"
 
+# On new message
 Messages.on "create", (message) ->
   io.emit "message", message
 
-ActiveUsers.on "create", (user) ->
+emitActiveUser = (io) ->
   ActiveUsers.find {}, (err, users) ->
     io.emit "users/active", users
 
+ActiveUsers.on "create", (user) ->
+  emitActiveUser(io)
+
 ActiveUsers.on "delete", (user) ->
-  ActiveUsers.find {}, (err, users) ->
-    io.emit "users/active", users
+  emitActiveUser(io)
 
 # Run server and return object
 # ============================
