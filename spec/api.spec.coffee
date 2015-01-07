@@ -94,12 +94,14 @@ describe "API Server", ->
   #   , 10
 
   # run an async expectation
-  async.it "did stuff", (done) ->
+  async.it "recieved new message event", (done) ->
     client.on "message", (message) ->
       console.log "new message!"
       console.log message
       expect(message.message).toBe "Hello world!"
+    done()
 
+  async.it "recieved users/active event", (done) ->
     client.on "users/active", (users) ->
       console.log "A user connected/disconnected"
       expect(users).toBe(jasmine.any(Object))
