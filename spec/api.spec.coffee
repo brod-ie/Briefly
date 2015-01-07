@@ -2,20 +2,16 @@
 __ = require "#{ __dirname }/../lib/__"
 frisby = require "frisby"
 io = require "socket.io-client"
+AsyncSpec = require "node-jasmine-async"
 
 # Determine config
 config = __.config()
+username = "brodie"
+password = "password"
+token = "abcde" # Dummy token accepted by API for username "brodie"
 
 describe "API Server", ->
   server = require "#{ __dirname }/../app/app"
-  username = "brodie"
-  password = "password"
-  token = "abcde" # Dummy token accepted by API for username "brodie"
-
-  # client = io.connect "http://localhost:#{ config.PORT }?token=12345"
-  # client.on "connect", (data) ->
-  #   console.log "connected!"
-  #   connected = true
 
   # REST API
   # ========
@@ -77,6 +73,34 @@ describe "API Server", ->
       token: token
     .toss()
 
+  # set up the async spec
+  async = new AsyncSpec(this)
+  client = null
+
+  # run an async setup
+  async.beforeEach (done) ->
+    client = io.connect "http://localhost:#{ config.PORT }?token=#{ token }"
+    client.on "connect", (data) ->
+      console.log "connected!"
+    done()
+
+  # run an async cleanup
+  # async.afterEach (done) ->
+
+  #   # simulate async cleanup
+  #   setTimeout ->
+  #     console.log "10 more ms gone.."
+  #     done()
+  #   , 10
+
+  # run an async expectation
+  async.it "did stuff", (done) ->
+    client.on "message", (message) ->
+      console.log "new message!"
+      console.log message
+      expect(message.message).toBe "Hello world!"
+    done()
+
   # MESSAGES
   # --------
   frisby
@@ -100,33 +124,32 @@ describe "API Server", ->
     .create "REST API can retrieve all messages"
     .get "http://localhost:#{ config.PORT }/messages?token=#{ token }"
     .expectStatus 200
-    .inspectBody()
     .toss()
 
   # ACTIVE USERS
   # ------------
-  # frisby
-  #   .create "REST API can return active users"
-  #   .get "http://localhost:#{ config.PORT }/users/active?token=#{ token }"
-  #   .expectStatus 200
-  #   .inspectBody()
-  #   .toss()
+  frisby
+    .create "REST API can return active users"
+    .get "http://localhost:#{ config.PORT }/users/active?token=#{ token }"
+    .expectStatus 200
+    .inspectBody()
+    .toss()
 
   # DEAUTHORISATION
   # ---------------
-  frisby
-    .create "REST API can deauthorise token"
-    .delete "http://localhost:#{ config.PORT }/auth?token=#{ token }"
-    .expectStatus 200
-    .expectJSON
-      success: "Token destroyed"
-    .toss()
+  # frisby
+  #   .create "REST API can deauthorise token"
+  #   .delete "http://localhost:#{ config.PORT }/auth?token=#{ token }"
+  #   .expectStatus 200
+  #   .expectJSON
+  #     success: "Token destroyed"
+  #   .toss()
 
-  frisby
-    .create "REST API can reject invalid token deauthorisation"
-    .delete "http://localhost:#{ config.PORT }/auth?token=12345"
-    .expectStatus 401
-    .toss()
+  # frisby
+  #   .create "REST API can reject invalid token deauthorisation"
+  #   .delete "http://localhost:#{ config.PORT }/auth?token=12345"
+  #   .expectStatus 401
+  #   .toss()
 
   # it 'can accept new message with valid token', ->
 
@@ -151,7 +174,9 @@ describe "API Server", ->
   # it 'can emit array of messages and users to new connection', ->
 
   # Timeout server now complete
-  afterEach ->
+  afterEach (done) ->
     setTimeout ->
+      client.disconnect()
       server.close()
     , 1000
+    done()

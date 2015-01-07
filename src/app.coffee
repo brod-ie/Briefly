@@ -30,6 +30,7 @@ save = require("save")
 
 Messages = save("messages")
 Users = save("users")
+ActiveUsers = save("active_users")
 Tokens = save("tokens")
 
 # ROOT
@@ -53,8 +54,6 @@ auth = (req, res, next) ->
     return unauthorized res
 
   Tokens.findOne { token: req.query.token }, (err, token) ->
-    console.log "found token.."
-    console.log token
     return unauthorized res if token is undefined
     req.token = token.token
     req.username = token.username
@@ -121,7 +120,6 @@ app.get "/messages", auth, (req, res, next) ->
 # -----------
 app.post "/user", (req, res, next) ->
   if not req.body? or not req.body.username? or not req.body.password?
-    console.log req.body
     err = new Error("Missing username or password")
     err.status = 400
     return next err
@@ -141,7 +139,9 @@ app.post "/user", (req, res, next) ->
 
 # Get active users
 # ----------------
-app.get "users/active", auth, (req, res, next) ->
+app.get "/users/active", auth, (req, res, next) ->
+  ActiveUsers.find {}, (err, users) ->
+    res.json users
 
 # ERROR HANDLING
 # ==============
@@ -154,7 +154,6 @@ app.use (req, res, next) ->
 
 # Error handler fn
 app.use (err, req, res, next) ->
-  console.log err
   res.status err.status or 500
   res.json
     error: err.message
@@ -168,19 +167,38 @@ io.use (socket, next) ->
   u = require("url").parse socket.handshake.url, true
 
   if not u.query? or not u.query.token?
+    console.log "Bad Socket.IO connection attempt"
     return socket.disconnect()
+
+  # Testing token
+  if u.query.token is "abcde"
+    socket.username = "brodie"
+    return next()
 
   Tokens.findOne { token: u.query.token }, (err, token) ->
     return socket.disconnect() if token is undefined
+    socket.username = token.username
     next()
 
 io.on "connection", (socket) ->
-  # Store socket.id internally as active?
-  console.log "A user connected!"
+  ActiveUsers.create { username: socket.username }, (err, user) ->
+    console.log "#{ user.username } connected!"
 
   socket.on "disconnect", (socket) ->
     # Remove socket.id from array?
-    console.log "A user disconnected :("
+    ActiveUsers.delete { username: socket.username }, (err) ->
+      console.log "#{ user.username } disconnected"
+
+Messages.on "create", (message) ->
+  io.emit "message", message
+
+ActiveUsers.on "create", (user) ->
+  ActiveUsers.find {}, (err, users) ->
+    io.emit "users/active", users
+
+ActiveUsers.on "delete", (user) ->
+  ActiveUsers.find {}, (err, users) ->
+    io.emit "users/active", users
 
 # Run server and return object
 # ============================

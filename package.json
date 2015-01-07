@@ -39,7 +39,8 @@
     "log-timestamp": "^0.1.1",
     "save": "0.0.20",
     "body-parser": "^1.10.1",
-    "rand-token": "^0.2.1"
+    "rand-token": "^0.2.1",
+    "node-jasmine-async": "^0.1.0"
   },
   "engines": {
     "node": "^0.10.33"
