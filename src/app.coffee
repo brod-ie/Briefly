@@ -33,6 +33,11 @@ Users = save("users")
 ActiveUsers = save("active_users")
 Tokens = save("tokens")
 
+# LOADERIO VERIFICATION
+# =====================
+app.get "/loaderio-fa1db6b2da5f4b83300113acc45c8a06/", (req, res) ->
+  res.send "loaderio-fa1db6b2da5f4b83300113acc45c8a06"
+
 # ROOT
 # ====
 app.get "/", (req, res) ->
