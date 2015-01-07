@@ -2,8 +2,6 @@
 
 # Briefly
 
-A chat server and client for G53SQM Autumn semester '14.
-
 ## Approach
 Test driven development - always!
 
@@ -33,6 +31,16 @@ Client:
 
 This API is used for app initialisation (authorising user, getting latest messages, retrieving current active users) as well as creating new messages and deauthorising the session.
 
+### Account creation
+
+`curl -X POST -H "Content-Type: application/json" -d '{"username":"brodes","password":"password"}' https://briefly-chat.herokuapp.com/user`
+
+Username must be unique, password is stored unencrypted. If successful a success object is returned:
+
+    {
+        success: "User created"
+    }
+
 ### Authorisation
 
 `curl -X POST -u 'username:pass' https://briefly-chat.herokuapp.com/auth`
@@ -56,7 +64,7 @@ Returns a success object if successful:
 
 ### Create message
 
-`curl -X POST -d "{'message':'Hello world!'}" https://briefly-chat.herokuapp.com/message?token=12345`
+`curl -X POST -H "Content-Type: application/json" -d '{"message":"Hello world!"}' https://briefly-chat.herokuapp.com/message?token=12345`
 
 Returns message object if successful:
 
