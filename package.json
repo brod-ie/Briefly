@@ -33,14 +33,16 @@
     "socket.io-client": "^1.2.1",
     "jasmine-reporters": "^1.0.1",
     "basic-auth": "^1.0.0",
-    "frisby": "^0.8.4",
     "url": "^0.10.2",
     "longjohn": "^0.2.4",
     "log-timestamp": "^0.1.1",
     "save": "0.0.20",
     "body-parser": "^1.10.1",
     "rand-token": "^0.2.1",
-    "node-jasmine-async": "^0.1.0"
+    "node-jasmine-async": "^0.1.0",
+    "gulp-jasmine": "^1.0.1",
+    "frisby": "^0.8.5",
+    "tracer": "^0.7.3"
   },
   "engines": {
     "node": "^0.10.33"

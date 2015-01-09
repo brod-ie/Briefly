@@ -1,12 +1,12 @@
 # Requires
 require "coffee-script/register" # Needed for .coffee modules
 require "longjohn" if process.env.NODE_ENV isnt "production"
-require "log-timestamp"
 
 express = require "express"
 
-# Lib classes
+# Helper classes
 __ = require "#{ __dirname }/../lib/__"
+logger = require("tracer").colorConsole()
 
 # Determine config
 config = __.config()
@@ -172,7 +172,7 @@ io.use (socket, next) ->
   u = require("url").parse socket.handshake.url, true
 
   if not u.query? or not u.query.token?
-    console.log "Bad Socket.IO connection attempt"
+    logger.warn "Bad Socket.IO connection attempt"
     return socket.disconnect()
 
   # Testing token
@@ -187,19 +187,22 @@ io.use (socket, next) ->
 
 io.on "connection", (socket) ->
   ActiveUsers.create { username: socket.username }, (err, user) ->
-    console.log "#{ user.username } connected!"
+    logger.info "#{ user.username } connected!"
 
-  socket.on "disconnect", (socket) ->
-    # Remove socket.id from array?
-    ActiveUsers.delete { username: socket.username }, (err) ->
-      console.log "#{ user.username } disconnected"
+  socket.on "disconnect", ->
+    logger.info "#{ socket.username } disconnected."
+    ActiveUsers.findOne { username: socket.username }, (err, user) ->
+      ActiveUsers.delete user._id, (err) ->
+        logger.info "User removed" if err is undefined
 
 # On new message
 Messages.on "create", (message) ->
   io.emit "message", message
 
+# Active user change
 emitActiveUser = (io) ->
   ActiveUsers.find {}, (err, users) ->
+    logger.info users
     io.emit "users/active", users
 
 ActiveUsers.on "create", (user) ->
@@ -211,4 +214,4 @@ ActiveUsers.on "delete", (user) ->
 # Run server and return object
 # ============================
 return server = http.listen config.PORT, ->
-  console.log "👂  Listening on port %d", server.address().port
+  logger.info "👂  Listening on port %d", server.address().port

@@ -10,7 +10,15 @@ paths =
     src: "./src/*.coffee"
     dest: "./app"
   tests:
-    src: "./tests/*.coffee"
+    src: "./spec/*.coffee"
+
+# Testing
+# =======
+gulp.task "test", ->
+  jasmine = require "gulp-jasmine"
+
+  gulp.src paths.tests.src
+    .pipe do jasmine
 
 # Scripts
 # =======

@@ -6,12 +6,12 @@ AsyncSpec = require "node-jasmine-async"
 
 # Determine config
 config = __.config()
+server = require "#{ __dirname }/../app/app" # Server on localhost:5000
 username = "brodie"
 password = "password"
 token = "abcde" # Dummy token accepted by API for username "brodie"
 
 describe "API Server", ->
-  server = require "#{ __dirname }/../app/app"
 
   # REST API
   # ========
@@ -80,30 +80,16 @@ describe "API Server", ->
   # run an async setup
   async.beforeEach (done) ->
     client = io.connect "http://localhost:#{ config.PORT }?token=#{ token }"
-    client.on "connect", (data) ->
-      console.log "connected!"
     done()
-
-  # run an async cleanup
-  # async.afterEach (done) ->
-
-  #   # simulate async cleanup
-  #   setTimeout ->
-  #     console.log "10 more ms gone.."
-  #     done()
-  #   , 10
 
   # run an async expectation
   async.it "recieved new message event", (done) ->
     client.on "message", (message) ->
-      console.log "new message!"
-      console.log message
       expect(message.message).toBe "Hello world!"
     done()
 
   async.it "recieved users/active event", (done) ->
     client.on "users/active", (users) ->
-      console.log "A user connected/disconnected"
       expect(users).toBe(jasmine.any(Object))
     done()
 
@@ -138,51 +124,32 @@ describe "API Server", ->
     .create "REST API can return active users"
     .get "http://localhost:#{ config.PORT }/users/active?token=#{ token }"
     .expectStatus 200
-    .inspectBody()
     .toss()
 
   # DEAUTHORISATION
   # ---------------
-  # frisby
-  #   .create "REST API can deauthorise token"
-  #   .delete "http://localhost:#{ config.PORT }/auth?token=#{ token }"
-  #   .expectStatus 200
-  #   .expectJSON
-  #     success: "Token destroyed"
-  #   .toss()
+  frisby
+    .create "REST API can deauthorise token"
+    .delete "http://localhost:#{ config.PORT }/auth?token=#{ token }"
+    .expectStatus 200
+    .expectJSON
+      success: "Token destroyed"
+    .toss()
 
-  # frisby
-  #   .create "REST API can reject invalid token deauthorisation"
-  #   .delete "http://localhost:#{ config.PORT }/auth?token=12345"
-  #   .expectStatus 401
-  #   .toss()
-
-  # it 'can accept new message with valid token', ->
-
-  # it 'Client can connect to SocketIO', ->
-  #   #expect(connected).toBe true
-
-  # it 'Can fail..', ->
-  #   #expect(true).toBe false
-
-  # it 'can be connected to with a valid access token', ->
-
-  # it 'can error when connected to with invalid access token', ->
-
-  # it 'can recieve a new message', ->
-
-  # it 'can '
-
-  # it 'can emit array of connected users on new connection', ->
-
-  # it 'can emit array of messages on new message', ->
-
-  # it 'can emit array of messages and users to new connection', ->
+  frisby
+    .create "REST API can reject invalid token deauthorisation"
+    .delete "http://localhost:#{ config.PORT }/auth?token=12345"
+    .expectStatus 401
+    .toss()
 
   # Timeout server now complete
   afterEach (done) ->
     setTimeout ->
+      # Disconnect Socket.IO first
       client.disconnect()
-      server.close()
-    , 1000
+      # Then close server
+      setTimeout ->
+        server.close()
+      , 1000
+    , 500
     done()
