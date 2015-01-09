@@ -42,7 +42,8 @@
     "node-jasmine-async": "^0.1.0",
     "gulp-jasmine": "^1.0.1",
     "frisby": "^0.8.5",
-    "tracer": "^0.7.3"
+    "tracer": "^0.7.3",
+    "jshint": "^2.5.11"
   },
   "engines": {
     "node": "^0.10.33"
