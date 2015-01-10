@@ -38,6 +38,9 @@ Tokens = save("tokens")
 app.get "/loaderio-fa1db6b2da5f4b83300113acc45c8a06/", (req, res) ->
   res.send "loaderio-fa1db6b2da5f4b83300113acc45c8a06"
 
+app.get "/test-data.json", (req, res) ->
+  res.json require "#{ __dirname }/../test-data.json"
+
 # ROOT
 # ====
 app.get "/", (req, res) ->
@@ -213,5 +216,7 @@ ActiveUsers.on "delete", (user) ->
 
 # Run server and return object
 # ============================
-return server = http.listen config.PORT, ->
+server = http.listen config.PORT, ->
   logger.info "👂  Listening on port %d", server.address().port
+
+return server # return for testing

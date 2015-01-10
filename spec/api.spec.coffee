@@ -73,16 +73,21 @@ describe "API Server", ->
       token: token
     .toss()
 
-  # set up the async spec
+  # REAL TIME API
+  # =============
+
+  # setup
   async = new AsyncSpec(this)
   client = null
 
-  # run an async setup
+  # connect to Socket.IO server
+  # ---------------------------
   async.beforeEach (done) ->
     client = io.connect "http://localhost:#{ config.PORT }?token=#{ token }"
     done()
 
-  # run an async expectation
+  # determine output is correct
+  # ---------------------------
   async.it "recieved new message event", (done) ->
     client.on "message", (message) ->
       expect(message.message).toBe "Hello world!"
@@ -141,6 +146,9 @@ describe "API Server", ->
     .delete "http://localhost:#{ config.PORT }/auth?token=12345"
     .expectStatus 401
     .toss()
+
+  # FINISH
+  # ======
 
   # Timeout server now complete
   afterEach (done) ->
