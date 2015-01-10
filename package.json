@@ -44,7 +44,8 @@
     "frisby": "^0.8.5",
     "tracer": "^0.7.3",
     "jshint": "^2.5.11",
-    "jshint-summary": "^0.4.0"
+    "jshint-summary": "^0.4.0",
+    "complexity-report": "^1.1.1"
   },
   "engines": {
     "node": "^0.10.33"

@@ -189,8 +189,9 @@ io.use (socket, next) ->
     next()
 
 io.on "connection", (socket) ->
-  ActiveUsers.create { username: socket.username }, (err, user) ->
-    logger.info "#{ user.username } connected!"
+  ActiveUsers.findOne { username: socket.username }, (err, user) ->
+    ActiveUsers.create { username: socket.username } if user is undefined
+    logger.info "#{ socket.username } connected!"
 
   socket.on "disconnect", ->
     logger.info "#{ socket.username } disconnected."
@@ -205,7 +206,6 @@ Messages.on "create", (message) ->
 # Active user change
 emitActiveUser = (io) ->
   ActiveUsers.find {}, (err, users) ->
-    logger.info users
     io.emit "users/active", users
 
 ActiveUsers.on "create", (user) ->
