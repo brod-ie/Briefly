@@ -9,59 +9,73 @@
 This API is used for app initialisation (authorising user, getting latest messages, retrieving current active users) as well as creating new messages and deauthorising the session.
 
 ### Account creation
-
-    curl -X POST -H "Content-Type: application/json" -d '{"username":"brodes","password":"password"}' \
-    https://briefly-chat.herokuapp.com/user
-
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"username":"brodes","password":"password"}' \
+https://briefly-chat.herokuapp.com/user
+```
 Username must be unique, password is stored unencrypted. If successful a success object is returned:
-
-    {
-        success: "User created"
-    }
-
+```json
+{
+    success: "User created"
+}
+```
 ### Authorisation
-
-    curl -X POST -u 'username:pass' https://briefly-chat.herokuapp.com/auth
+```bash
+curl -X POST -u 'username:pass' https://briefly-chat.herokuapp.com/auth
+```
 
 Returns a unique token if valid:
-
-    {
-        token: "12345",
-        username: "brodie"
-    }
+```json
+{
+    token: "12345",
+    username: "brodie"
+}
+```
 
 ### Deauthorisation
 
-    curl -X DELETE https://briefly-chat.herokuapp.com/auth?token=12345
+```bash
+curl -X DELETE https://briefly-chat.herokuapp.com/auth?token=12345
+```
 
 Returns a success object if successful:
 
-    {
-        success: "Invalidated token"
-    }
+```json
+{
+    success: "Invalidated token"
+}
+```
 
 ### Create message
 
-    curl -X POST -H "Content-Type: application/json" -d '{"message":"Hello world!"}' \
-    https://briefly-chat.herokuapp.com/message?token=12345
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"message":"Hello world!"}' \
+https://briefly-chat.herokuapp.com/message?token=12345
+```
 
 Returns message object if successful:
 
-    {
-        message: "Hello world!",
-        at: 1420025338,
-        from: "brodie"
-    }
+```json
+{
+    message: "Hello world!",
+    at: 1420025338,
+    from: "brodie"
+}
+```
 
 ### Get messages
 
-    curl -X GET https://briefly-chat.herokuapp.com/messages?token=12345
+```bash
+curl -X GET https://briefly-chat.herokuapp.com/messages?token=12345
+```
 
 Returns last 10 messages (array of message objects) if successful.
 
 ### Get active users
 
-    curl -X GET https://briefly-chat.herokuapp.com/users/active?token=12345
+```bash
+curl -X GET https://briefly-chat.herokuapp.com/users/active?token=12345
+```
 
 Returns an array of user objects of active users. These users are deemed active based on whether they are connected to the Real Time API with a valid access token.
 
@@ -71,16 +85,19 @@ This API should only be used to provide Real Time updates to the client. When co
 
 ### Connecting
 
-    SocketIO.connect "https://briefly-chat.herokuapp.com/?token=abcdefgh"
-
+```coffeescript
+SocketIO.connect "https://briefly-chat.herokuapp.com/?token=abcdefgh"
+```
 ### New message event
 
-    SocketIO.on "message", (data) ->
+```coffeescript
+SocketIO.on "message", (data) ->
+```
 
 Where `data` is a valid message object.
 
 ### Active users change event
-
-    SocketIO.on "users/active", (data) ->
-
+```coffeescript
+SocketIO.on "users/active", (data) ->
+```
 Where `data` is an array of user objects.
