@@ -2,9 +2,7 @@
 class __
 
   config: ->
-    if process.env.ENVIRONMENT?
-      return process.env
-    else
-      return require "#{ __dirname }/../../Briefly.json"
+    return process.env if process.env.ENVIRONMENT?
+    return require "#{ __dirname }/../../Briefly.json"
 
 module.exports = new __
