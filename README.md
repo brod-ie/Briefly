@@ -2,30 +2,7 @@
 
 # Briefly
 
-## Approach
-Test driven development - always!
-
-We chose to have to distinct repositories due to the nature of Travis CI running *all* tests on push which would prove problematic.
-
-Bottleneck for Matt with the server needing to be built or spec finalised.
-
-### Plan of development
-
-1. Finalise spec
-2. Write tests
-3. Develop
-4. Release
-
-### Testing methodology
-Server:
-- Unit testing
-- Load.io testing (how the server scales)
-- Code coverage
-- Coffeescript linting and reporting
-
-Client:
-- Unit testing
-- Front end testing
+> Server component of G53SQM 14/15 coursework
 
 ## RESTful API
 
