@@ -33,7 +33,8 @@ This API is used for app initialisation (authorising user, getting latest messag
 
 ### Account creation
 
-`curl -X POST -H "Content-Type: application/json" -d '{"username":"brodes","password":"password"}' https://briefly-chat.herokuapp.com/user`
+    curl -X POST -H "Content-Type: application/json" -d '{"username":"brodes","password":"password"}' \
+    https://briefly-chat.herokuapp.com/user
 
 Username must be unique, password is stored unencrypted. If successful a success object is returned:
 
@@ -43,7 +44,7 @@ Username must be unique, password is stored unencrypted. If successful a success
 
 ### Authorisation
 
-`curl -X POST -u 'username:pass' https://briefly-chat.herokuapp.com/auth`
+    curl -X POST -u 'username:pass' https://briefly-chat.herokuapp.com/auth
 
 Returns a unique token if valid:
 
@@ -54,7 +55,7 @@ Returns a unique token if valid:
 
 ### Deauthorisation
 
-`curl -X DELETE https://briefly-chat.herokuapp.com/auth?token=12345`
+    curl -X DELETE https://briefly-chat.herokuapp.com/auth?token=12345
 
 Returns a success object if successful:
 
@@ -64,7 +65,8 @@ Returns a success object if successful:
 
 ### Create message
 
-`curl -X POST -H "Content-Type: application/json" -d '{"message":"Hello world!"}' https://briefly-chat.herokuapp.com/message?token=12345`
+    curl -X POST -H "Content-Type: application/json" -d '{"message":"Hello world!"}' \
+    https://briefly-chat.herokuapp.com/message?token=12345
 
 Returns message object if successful:
 
@@ -76,13 +78,13 @@ Returns message object if successful:
 
 ### Get messages
 
-`curl -X GET https://briefly-chat.herokuapp.com/messages?token=12345`
+    curl -X GET https://briefly-chat.herokuapp.com/messages?token=12345
 
 Returns last 10 messages (array of message objects) if successful.
 
 ### Get active users
 
-`curl -X GET https://briefly-chat.herokuapp.com/users/active?token=12345`
+    curl -X GET https://briefly-chat.herokuapp.com/users/active?token=12345
 
 Returns an array of user objects of active users. These users are deemed active based on whether they are connected to the Real Time API with a valid access token.
 
@@ -92,16 +94,16 @@ This API should only be used to provide Real Time updates to the client. When co
 
 ### Connecting
 
-`SocketIO.connect "https://briefly-chat.herokuapp.com/?token=abcdefgh"`
+    SocketIO.connect "https://briefly-chat.herokuapp.com/?token=abcdefgh"
 
 ### New message event
 
-`SocketIO.on "message", (data) ->`
+    SocketIO.on "message", (data) ->
 
 Where `data` is a valid message object.
 
 ### Active users change event
 
-`SocketIO.on "users/active", (data) ->`
+    SocketIO.on "users/active", (data) ->
 
 Where `data` is an array of user objects.
