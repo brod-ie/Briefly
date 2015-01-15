@@ -30,7 +30,7 @@ Performs tests using jasmine-node and Frisby.
     
 Runs the server using supervisor.
 
-## Interacting with Briefly
+## Interacting with Briefly
 
 For a fully functional Briefly client refer to [mherod/Briefly-Client](https://github.com/mherod/Briefly-Client).
 
