@@ -4,11 +4,41 @@
 
 > Server component of G53SQM 14/15 coursework
 
-## RESTful API
+## Usage
+
+### Initialise
+
+    npm install
+    
+Installs all dependencies found in [`package.json`](https://github.com/ryanbrodie/Briefly/blob/master/package.json).
+
+### Build
+
+    npm run build
+    
+Builds source using [Gulp](http://gulpjs.com/).
+
+### Test
+
+    npm run test
+
+Performs tests using jasmine-node and Frisby.
+
+### Run
+
+    npm start
+    
+Runs the server using supervisor.
+
+## Interacting with Briefly
+
+For a fully functional Briefly client refer to [mherod/Briefly-Client](https://github.com/mherod/Briefly-Client).
+
+### RESTful API
 
 This API is used for app initialisation (authorising user, getting latest messages, retrieving current active users) as well as creating new messages and deauthorising the session.
 
-### Account creation
+#### Account creation
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{"username":"brodes","password":"password"}' \
 https://briefly-chat.herokuapp.com/user
@@ -19,7 +49,7 @@ Username must be unique, password is stored unencrypted. If successful a success
     success: "User created"
 }
 ```
-### Authorisation
+#### Authorisation
 ```bash
 curl -X POST -u 'username:pass' https://briefly-chat.herokuapp.com/auth
 ```
@@ -32,7 +62,7 @@ Returns a unique token if valid:
 }
 ```
 
-### Deauthorisation
+#### Deauthorisation
 
 ```bash
 curl -X DELETE https://briefly-chat.herokuapp.com/auth?token=12345
@@ -46,7 +76,7 @@ Returns a success object if successful:
 }
 ```
 
-### Create message
+#### Create message
 
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{"message":"Hello world!"}' \
@@ -63,7 +93,7 @@ Returns message object if successful:
 }
 ```
 
-### Get messages
+#### Get messages
 
 ```bash
 curl -X GET https://briefly-chat.herokuapp.com/messages?token=12345
@@ -71,7 +101,7 @@ curl -X GET https://briefly-chat.herokuapp.com/messages?token=12345
 
 Returns last 10 messages (array of message objects) if successful.
 
-### Get active users
+#### Get active users
 
 ```bash
 curl -X GET https://briefly-chat.herokuapp.com/users/active?token=12345
@@ -79,16 +109,16 @@ curl -X GET https://briefly-chat.herokuapp.com/users/active?token=12345
 
 Returns an array of user objects of active users. These users are deemed active based on whether they are connected to the Real Time API with a valid access token.
 
-## Real Time API
+### Real Time API
 
 This API should only be used to provide Real Time updates to the client. When connected using a valid token the user will be marked as active. On disconnection or deauthorisation the user in question will be marked as inactive.
 
-### Connecting
+#### Connecting
 
 ```coffeescript
 SocketIO.connect "https://briefly-chat.herokuapp.com/?token=abcdefgh"
 ```
-### New message event
+#### New message event
 
 ```coffeescript
 SocketIO.on "message", (data) ->
@@ -96,7 +126,7 @@ SocketIO.on "message", (data) ->
 
 Where `data` is a valid message object.
 
-### Active users change event
+#### Active users change event
 ```coffeescript
 SocketIO.on "users/active", (data) ->
 ```
