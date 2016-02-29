@@ -72,7 +72,7 @@ Returns a success object if successful:
 
 ```json
 {
-    success: "Invalidated token"
+    "success": "Invalidated token"
 }
 ```
 
